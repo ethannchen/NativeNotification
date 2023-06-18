@@ -8,6 +8,7 @@
 import React, { useEffect } from 'react';
 import type {PropsWithChildren} from 'react';
 import {
+  Alert,
   Button,
   SafeAreaView,
   ScrollView,
@@ -27,6 +28,10 @@ import {
 } from 'react-native/Libraries/NewAppScreen';
 import notifee, { EventType }  from '@notifee/react-native';
 import { AndroidColor } from '@notifee/react-native';
+import {PermissionsAndroid} from 'react-native';
+import messaging from '@react-native-firebase/messaging';
+
+
 
 function App(): JSX.Element {
   const isDarkMode = useColorScheme() === 'dark';
@@ -36,6 +41,8 @@ function App(): JSX.Element {
   };
 
   async function onDisplayNotification() {
+    PermissionsAndroid.request(PermissionsAndroid.PERMISSIONS.POST_NOTIFICATIONS);
+
     // Request permissions (required for iOS)
     await notifee.requestPermission()
 
@@ -74,6 +81,14 @@ function App(): JSX.Element {
     });
   }, []);
 
+  // useEffect(() => {
+  //   const unsubscribe = messaging().onMessage(async remoteMessage => {
+  //     Alert.alert('A new FCM message arrived!', JSON.stringify(remoteMessage));
+  //   });
+
+  //   return unsubscribe;
+  // }, []);
+
   return (
     <SafeAreaView style={backgroundStyle}>
       <StatusBar
@@ -88,6 +103,7 @@ function App(): JSX.Element {
           style={{
             backgroundColor: isDarkMode ? Colors.black : Colors.white,
           }}>
+          <Text>Testing FCM ...</Text>
           <Button
             title="Display Notification"
             onPress={() => onDisplayNotification()}
