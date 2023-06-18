@@ -5,7 +5,7 @@
  * @format
  */
 
-import React, { useEffect } from 'react';
+import React, {useEffect} from 'react';
 import type {PropsWithChildren} from 'react';
 import {
   Alert,
@@ -26,12 +26,13 @@ import {
   LearnMoreLinks,
   ReloadInstructions,
 } from 'react-native/Libraries/NewAppScreen';
-import notifee, { EventType }  from '@notifee/react-native';
-import { AndroidColor } from '@notifee/react-native';
+import notifee, {EventType} from '@notifee/react-native';
+import {AndroidColor} from '@notifee/react-native';
 import {PermissionsAndroid} from 'react-native';
-import messaging from '@react-native-firebase/messaging';
-
-
+import messaging, {
+  RemoteMessage,
+  Notification,
+} from '@react-native-firebase/messaging';
 
 function App(): JSX.Element {
   const isDarkMode = useColorScheme() === 'dark';
@@ -41,10 +42,12 @@ function App(): JSX.Element {
   };
 
   async function onDisplayNotification() {
-    PermissionsAndroid.request(PermissionsAndroid.PERMISSIONS.POST_NOTIFICATIONS);
+    PermissionsAndroid.request(
+      PermissionsAndroid.PERMISSIONS.POST_NOTIFICATIONS,
+    );
 
     // Request permissions (required for iOS)
-    await notifee.requestPermission()
+    await notifee.requestPermission();
 
     // Create a channel (required for Android)
     const channelId = await notifee.createChannel({
@@ -69,7 +72,7 @@ function App(): JSX.Element {
 
   // Subscribe to events
   useEffect(() => {
-    return notifee.onForegroundEvent(({ type, detail }) => {
+    return notifee.onForegroundEvent(({type, detail}) => {
       switch (type) {
         case EventType.DISMISSED:
           console.log('User dismissed notification', detail.notification);
@@ -81,13 +84,39 @@ function App(): JSX.Element {
     });
   }, []);
 
-  // useEffect(() => {
-  //   const unsubscribe = messaging().onMessage(async remoteMessage => {
-  //     Alert.alert('A new FCM message arrived!', JSON.stringify(remoteMessage));
-  //   });
+  // // use of interface
+  // const payload : Notification= {
+  //   title: "diy title",
+  //   body: "diy body"
+  // }
 
-  //   return unsubscribe;
-  // }, []);
+  // const msg : RemoteMessage= {
+  //   notification:payload
+  // };
+
+  // console.log("Title: " + msg.notification.title + "\nBody: " + msg.notification.body);
+
+  async function onMessageReceived(remoteMessage) {
+    // const msg = JSON.parse(remoteMessage.notification)
+
+    // Do something
+    Alert.alert('A new FCM message arrived!', JSON.stringify(remoteMessage));
+    // console.log("Title: " + msg.notification.title + "\nBody: " + msg.notification.body);
+    console.log(
+      'Title: ' +
+        remoteMessage.notification.title +
+        '\nBody: ' +
+        remoteMessage.notification.body,
+    );
+  }
+
+  useEffect(() => {
+    // foreground
+    const unsubscribe = messaging().onMessage(onMessageReceived);
+    messaging().setBackgroundMessageHandler(onMessageReceived);
+
+    return unsubscribe;
+  }, []);
 
   return (
     <SafeAreaView style={backgroundStyle}>
