@@ -5,8 +5,8 @@
  * @format
  */
 
-import React, {useEffect} from 'react';
-import type {PropsWithChildren} from 'react';
+import React, { useEffect } from 'react';
+import type { PropsWithChildren } from 'react';
 import {
   Alert,
   Button,
@@ -26,9 +26,9 @@ import {
   LearnMoreLinks,
   ReloadInstructions,
 } from 'react-native/Libraries/NewAppScreen';
-import notifee, {EventType} from '@notifee/react-native';
-import {AndroidColor} from '@notifee/react-native';
-import {PermissionsAndroid} from 'react-native';
+import notifee, { EventType } from '@notifee/react-native';
+import { AndroidColor } from '@notifee/react-native';
+import { PermissionsAndroid } from 'react-native';
 import messaging, {
   RemoteMessage,
   Notification,
@@ -72,7 +72,7 @@ function App(): JSX.Element {
 
   // Subscribe to events
   useEffect(() => {
-    return notifee.onForegroundEvent(({type, detail}) => {
+    return notifee.onForegroundEvent(({ type, detail }) => {
       switch (type) {
         case EventType.DISMISSED:
           console.log('User dismissed notification', detail.notification);
@@ -97,26 +97,25 @@ function App(): JSX.Element {
   // console.log("Title: " + msg.notification.title + "\nBody: " + msg.notification.body);
 
   async function onMessageReceived(remoteMessage) {
-    // const msg = JSON.parse(remoteMessage.notification)
-
     // Do something
     Alert.alert('A new FCM message arrived!', JSON.stringify(remoteMessage));
-    // console.log("Title: " + msg.notification.title + "\nBody: " + msg.notification.body);
     console.log(
       'Title: ' +
-        remoteMessage.notification.title +
-        '\nBody: ' +
-        remoteMessage.notification.body,
+      remoteMessage.notification.title +
+      ', Body: ' +
+      remoteMessage.notification.body,
     );
   }
 
-  useEffect(() => {
-    // foreground
-    const unsubscribe = messaging().onMessage(onMessageReceived);
-    messaging().setBackgroundMessageHandler(onMessageReceived);
+  messaging().onMessage(onMessageReceived);
+  messaging().setBackgroundMessageHandler(onMessageReceived);
 
-    return unsubscribe;
-  }, []);
+  // useEffect(() => {
+  //   // foreground
+  //   const unsubscribe = 
+
+  //   return unsubscribe;
+  // }, []);
 
   return (
     <SafeAreaView style={backgroundStyle}>
